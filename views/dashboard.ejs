@@ -1,0 +1,276 @@
+<!-- <!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Remedial.ai // Developer Console</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="h-full font-sans antialiased">
+    <div class="min-h-full">
+      <header
+        class="sticky top-0 z-40 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md"
+      >
+        <div
+          class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between"
+        >
+          <div class="flex items-center gap-3">
+            <span
+              class="text-xl font-bold tracking-tight bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent"
+              >Remedial.ai</span
+            >
+            <span
+              class="rounded-full bg-teal-500/10 px-2 py-0.5 text-xs font-medium text-teal-400 ring-1 ring-inset ring-teal-500/20"
+              >Beta Engine</span
+            >
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-sm text-slate-400">Pro Tier Active</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <section
+          class="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl"
+        >
+          <h2 class="text-lg font-semibold mb-2">
+            Optimize an Application Space
+          </h2>
+          <p class="text-sm text-slate-400 mb-6">
+            Enter a root domain. Our engine will crawl internal paths, run
+            accessibility & SEO schema evaluations, and compile a
+            production-ready `/optimized` parallel clone directory.
+          </p>
+
+          <form
+            hx-post="/api/scan"
+            hx-target="#dashboard-results"
+            hx-indicator="#loading-spinner"
+            class="flex gap-3 max-w-3xl"
+          >
+            <input
+              type="url"
+              name="targetUrl"
+              required
+              placeholder="https://example-static-site.com"
+              class="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            />
+            <button
+              type="submit"
+              class="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-md transition duration-150 hover:opacity-90 active:scale-95"
+            >
+              Initialize Pipeline
+            </button>
+          </form>
+
+          <div
+            id="loading-spinner"
+            class="htmx-indicator mt-6 flex items-center gap-3 text-sm text-slate-400"
+          >
+            <svg
+              class="animate-spin h-5 w-5 text-teal-400"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Executing deep site crawl & structural transformations...
+          </div>
+        </section>
+
+        <section id="dashboard-results" class="mt-8"></section>
+      </main>
+    </div>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Remedi.ai | Dashboard Workspace</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+    />
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+    <style>
+      :root {
+        --bg-main: #020617 !important;
+        --bg-surface: #0f172a !important;
+        --text-base: #f1f5f9 !important;
+      }
+
+      .light-theme {
+        --bg-main: #f8fafc !important;
+        --bg-surface: #ffffff !important;
+        --text-base: #0f172a !important;
+      }
+
+      html,
+      body {
+        background-color: var(--bg-main) !important;
+        color: var(--text-base) !important;
+        transition:
+          background-color 0.15s ease,
+          color 0.15s ease;
+      }
+
+      .submit-btn {
+        border: 1px solid white;
+        margin: 6px;
+      }
+
+      /* Target specific components dynamically across dark/light updates */
+      .light-theme .bg-slate-900,
+      .light-theme .bg-slate-900\/80 {
+        background-color: var(--bg-surface) !important;
+        border-color: #cbd5e1 !important;
+      }
+
+      .light-theme .bg-slate-950 {
+        background-color: #f1f5f9 !important;
+      }
+
+      .light-theme .text-slate-300 {
+        color: #334155 !important;
+      }
+      .light-theme .text-slate-400 {
+        color: #475569 !important;
+      }
+      .light-theme .border-slate-800 {
+        border-color: #e2e8f0 !important;
+      }
+
+      .light-theme .targetUrl {
+        border: 1px solid gray;
+      }
+      .light-theme .submit-btn {
+        margin: 6px;
+        background-color: #0f172a;
+        color: white;
+      }
+
+      @media (max-width:600px) {
+        .input-n-btn-div {
+            display: flex;
+            flex-direction: column;
+        }
+        .targetUrl {
+            width: 200px;
+        }
+      }
+    </style>
+  </head>
+  <!-- <body class="min-h-screen flex flex-col justify-between"> -->
+    <body class="min-h-screen bg-slate-950 text-slate-100 overflow-x-hidden antialiased">
+    <%- include('partials/navbar') %>
+
+    <main class="max-w-7xl mx-auto px-6 py-12 w-full flex-grow">
+        
+      <section
+        class="border border-slate-800 bg-slate-900 p-8 rounded-2xl shadow-xl"
+      >
+        <h2 class="text-xl font-bold">Initialize Deployment Scan Pipeline</h2>
+        <p class="text-xs text-slate-400 mt-1 mb-6">
+          Execution profile context:
+          <span class="text-teal-400"><%= user.email %></span> (<span
+            class="uppercase text-emerald-400 font-mono"
+            ><%= user.tier %> level access</span
+          >)
+        </p>
+        <span class="m-3 text-sm">Enter target URL to start</span>
+
+        <form
+          hx-post="/api/scan"
+          hx-target="#dashboard-results"
+          hx-indicator="#loading-spinner"
+          class="flex gap-4 max-w-3xl"
+        >
+        <div class="input-n-btn-div">
+          <input
+            type="url"
+            name="targetUrl"
+            required
+            placeholder="https://example-static-site.com"
+            class="targetUrl  bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-teal-500 text-slate-600"
+          />
+          <button
+            type="submit"
+            class="submit-btn bg-gradient-to-r from-teal-500 to-cyan-500 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm shadow-md transition transform active:scale-95"
+          >
+            Run Optimization
+          </button>
+          </div>
+        </form>
+
+        <div
+          id="loading-spinner"
+          class="htmx-indicator mt-4 text-xs text-slate-400 flex items-center gap-2"
+        >
+          <svg
+            class="animate-spin h-4 w-4 text-teal-400"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Evaluating architecture nodes & parsing DOM branches...
+        </div>
+      </section>
+
+      <section id="dashboard-results" class="mt-8"></section>
+    </main>
+
+    <%- include('partials/footer') %>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // This will now execute cleanly without throwing a ReferenceError
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
+  </body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-slate-950 text-slate-100">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Remedi.ai | Autonomous Web App SEO & A11y Engine</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+    />
+    <style>
+      :root {
+        --bg-main: #020617 !important;
+        --bg-surface: #0f172a !important;
+        --text-base: #f1f5f9 !important;
+      }
+
+      .light-theme {
+        --bg-main: #f8fafc !important;
+        --bg-surface: #ffffff !important;
+        --text-base: #0f172a !important;
+      }
+
+      html,
+      body {
+        background-color: var(--bg-main) !important;
+        color: var(--text-base) !important;
+        transition:
+          background-color 0.15s ease,
+          color 0.15s ease;
+      }
+
+      .launch-dash-btn {
+        border: 1px solid white;
+      }
+
+      /* Target specific components dynamically across dark/light updates */
+      .light-theme .hero-h1 {
+        color: var(--text-base);
+      }
+      .light-theme .bg-slate-900,
+      .light-theme .bg-slate-900\/80 {
+        background-color: var(--bg-surface) !important;
+        border-color: #cbd5e1 !important;
+      }
+
+      .light-theme .bg-slate-950 {
+        background-color: #f1f5f9 !important;
+      }
+
+      .light-theme .text-slate-300 {
+        color: #334155 !important;
+      }
+      .light-theme .text-slate-400 {
+        color: #475569 !important;
+      }
+      .light-theme .border-slate-800 {
+        border-color: #e2e8f0 !important;
+      }
+
+      .light-theme .launch-dash-btn {
+        border: 1px solid black;
+      }
+      .light-theme .auto-pipe-text {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col justify-between">
+    <%- include('partials/navbar') %>
+
+    <header class="max-w-4xl mx-auto text-center px-6 py-24 space-y-6">
+      <span
+        class="auto-pipe-text px-3 py-1 text-xs rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 font-mono"
+        >Automated Optimization Pipeline</span
+      >
+      <h1
+        class="hero-h1 text-5xl font-extrabold tracking-tight lg:text-6xl bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent"
+      >
+        Crawls your app. Injects your fixes. Instantly.
+      </h1>
+      <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+        Stop debugging missing alt attributes, unlinked ARIA landmarks, and
+        broken header hierarchies. Remedial transforms your application package
+        into a standard optimized release bundle automatically.
+      </p>
+      <div>
+        <a
+          href="/auth/login"
+          class="launch-dash-btn inline-block bg-gradient-to-r from-teal-500 to-cyan-500 text-slate-950 font-bold px-8 py-4 rounded-xl text-md transition transform hover:scale-105 shadow-lg shadow-teal-500/20"
+        >
+          Launch Dashboard Free Scan
+        </a>
+      </div>
+    </header>
+
+    <section id="pricing" class="max-w-6xl mx-auto px-6 py-12 w-full">
+      <h2 class="text-3xl font-bold text-center mb-12">
+        Flexible Developer Tiers
+      </h2>
+      <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div
+          class="border border-slate-800 bg-slate-900/50 p-8 rounded-2xl flex flex-col justify-between"
+        >
+          <div>
+            <h3 class="text-xl font-bold">Hobby Sandbox</h3>
+            <p class="text-slate-400 text-sm mt-2">
+              Perfect for diagnostic evaluation of static landing paths.
+            </p>
+            <div class="my-6 text-4xl font-extrabold">
+              $0 <span class="text-xs text-slate-500 font-normal">forever</span>
+            </div>
+            <ul class="space-y-3 text-sm text-slate-300">
+              <li>✓ 1 Active site parsing index</li>
+              <li>✓ Up to 6 pages crawled per session</li>
+              <li>✓ Raw diagnostic visibility logs</li>
+            </ul>
+          </div>
+          <a
+            href="/auth/login"
+            class="mt-8 block text-center bg-slate-800 hover:bg-slate-700 py-2.5 rounded-xl text-sm font-semibold"
+            >Deploy Free Workspace</a
+          >
+        </div>
+
+        <div
+          class="border-2 border-teal-500 bg-slate-900 p-8 rounded-2xl flex flex-col justify-between shadow-2xl relative"
+        >
+          <span
+            class="absolute -top-3 right-6 bg-teal-500 text-slate-950 text-[10px] font-mono tracking-widest uppercase px-3 py-1 rounded-full font-bold"
+            >Recommended</span
+          >
+          <div>
+            <h3 class="text-xl font-bold text-teal-400">Production Pro</h3>
+            <p class="text-slate-400 text-sm mt-2">
+              Autonomous structural repairs engineered for scale pipelines.
+            </p>
+            <div class="my-6 text-4xl font-extrabold">
+              $29
+              <span class="text-xs text-slate-500 font-normal">/ month</span>
+            </div>
+            <ul class="space-y-3 text-sm text-slate-200">
+              <li>✓ Infinite continuous site indexes</li>
+              <li>✓ **Active Structural Autofix Engine**</li>
+              <li>✓ Download /optimized bundle source zip directly</li>
+            </ul>
+          </div>
+          <a
+            href="/auth/login?register=true"
+            class="mt-8 block text-center bg-gradient-to-r from-teal-500 to-cyan-500 text-slate-950 py-2.5 rounded-xl text-sm font-bold"
+            >Unlock Production Automation</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section id="faqs" class="max-w-4xl mx-auto px-6 py-20 w-full space-y-6">
+      <h2 class="text-3xl font-bold text-center mb-12">
+        Frequently Answered Parameters
+      </h2>
+      <div class="border border-slate-800 bg-slate-900/40 p-5 rounded-xl">
+        <h3 class="font-semibold text-teal-400">
+          Does this modify my database or core working code directly?
+        </h3>
+        <p class="text-sm text-slate-400 mt-2">
+          No. The service creates an optimized duplicate directory structure
+          without changing your original source files. This lets you inspect the
+          changes before moving them to production.
+        </p>
+      </div>
+      <div class="border border-slate-800 bg-slate-900/40 p-5 rounded-xl">
+        <h3 class="font-semibold text-teal-400">
+          Can I configure this directly into a GitHub Actions CI pipeline flow?
+        </h3>
+        <p class="text-sm text-slate-400 mt-2">
+          Yes, our Pro architecture features API webhook execution parameters
+          enabling automated builds on every deployment merge request.
+        </p>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

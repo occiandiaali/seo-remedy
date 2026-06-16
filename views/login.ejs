@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-slate-950 text-slate-100">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Remedial Engine Gateway Authenticator</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+    />
+
+    <style>
+      :root {
+        --bg-main: #020617;
+        --bg-surface: #0f172a;
+        --text-base: #f1f5f9;
+      }
+      .light-theme {
+        --bg-main: #f8fafc;
+        --bg-surface: #ffffff;
+        --text-base: #0f172a;
+      }
+      html,
+      body {
+        background-color: var(--bg-main) !important;
+        color: var(--text-base) !important;
+        transition:
+          background-color 0.15s ease,
+          color 0.15s ease;
+      }
+
+      .login-cta {
+        border: 1px solid white;
+      }
+      .light-theme .bg-slate-900 {
+        background-color: var(--bg-surface) !important;
+      }
+      .light-theme .text-slate-400 {
+        color: #475569 !important;
+      }
+      .light-theme .border-slate-800 {
+        border-color: #cbd5e1 !important;
+      }
+
+      .light-theme .email-fld,
+      .pass-fld {
+        border: 1px solid lightgray;
+      }
+      .light-theme .login-cta {
+        background-color: #0f172a;
+        color: white;
+      }
+
+      .spinner {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #000;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen flex flex-col items-center justify-center p-6"
+    x-data="{ viewRegister: new URLSearchParams(window.location.search).get('register') === 'true' }"
+  >
+    <a
+      href="/"
+      class="mb-4 text-xs font-mono text-slate-500 hover:text-teal-400 transition"
+      >← Return to Homepage</a
+    >
+
+    <div
+      class="w-full max-w-md space-y-6 border border-slate-800 bg-slate-900 p-8 rounded-2xl shadow-xl"
+    >
+      <div class="text-center">
+        <h1
+          id="login-brand-logo"
+          class="text-2xl font-extrabold tracking-tight text-teal-400"
+        >
+          Remedial.ai
+        </h1>
+        <p class="text-xs text-slate-400 mt-2">
+          Identity Configuration Verification Gateway
+        </p>
+      </div>
+
+      <div
+        id="alert-box"
+        class="hidden p-3 text-xs rounded font-medium text-center"
+      ></div>
+
+      <div class="flex border-b border-slate-800 text-xs font-mono mb-4">
+        <button
+          type="button"
+          @click="viewRegister = false; window.history.replaceState({}, '', '/auth/login')"
+          :class="!viewRegister ? 'text-teal-400 border-b-2 border-teal-400 font-bold' : 'text-slate-500 hover:text-slate-400'"
+          class="flex-1 pb-2 transition focus:outline-none"
+        >
+          Sign In
+        </button>
+        <button
+          type="button"
+          @click="viewRegister = true; window.history.replaceState({}, '', '/auth/login?register=true')"
+          :class="viewRegister ? 'text-teal-400 border-b-2 border-teal-400 font-bold' : 'text-slate-500 hover:text-slate-400'"
+          class="flex-1 pb-2 transition focus:outline-none"
+        >
+          Register Account
+        </button>
+      </div>
+
+      <form id="auth-form" class="space-y-4">
+        <div>
+          <label
+            class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1"
+            >Email Address</label
+          >
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="you@example.com"
+            required
+            class="email-fld w-full text-sm bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-teal-500"
+          />
+        </div>
+        <div>
+          <label
+            class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1"
+            >Password Credentials</label
+          >
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="Min. 8 characters"
+            required
+            class="pass-fld w-full text-sm bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:outline-none focus:border-teal-500"
+          />
+        </div>
+
+        <button
+          type="submit"
+          id="submit-btn"
+          class="login-cta w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-slate-950 font-bold p-2.5 rounded-lg text-sm transition hover:opacity-90 shadow-md flex items-center justify-center gap-2"
+        >
+          <span
+            id="btn-text"
+            x-text="viewRegister ? 'Create SaaS Account' : 'Sign In'"
+          ></span>
+          <div id="btn-spinner" class="spinner"></div>
+        </button>
+      </form>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+    <script>
+      document
+        .getElementById("auth-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const btn = document.getElementById("submit-btn");
+          const btnText = document.getElementById("btn-text");
+          const spinner = document.getElementById("btn-spinner");
+          const alertBox = document.getElementById("alert-box");
+
+          const isRegister = window.location.search.includes("register=true");
+          const endpoint = isRegister ? "/auth/register" : "/auth/login";
+
+          // 1. Enter Loading State
+          btn.disabled = true;
+          btn.style.opacity = "0.7";
+          spinner.style.display = "block";
+          btnText.innerText = isRegister
+            ? "Provisioning..."
+            : "Verifying Token...";
+          alertBox.className = "hidden"; // Hide previous alerts
+
+          try {
+            // 2. Fetch API Submission (Transmits as regular URL-encoded body parameters)
+            const formData = new URLSearchParams(new FormData(e.target));
+            const response = await fetch(endpoint, {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: formData,
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+              // Display friendly error styles
+              alertBox.innerText =
+                result.message || "An authentication pipeline error occurred.";
+              alertBox.className =
+                "p-3 text-xs rounded border border-red-500/30 bg-red-500/10 text-red-400 font-medium text-center block";
+
+              // Reset Button States
+              btn.disabled = false;
+              btn.style.opacity = "1";
+              spinner.style.display = "none";
+              btnText.innerText = isRegister
+                ? "Create SaaS Account"
+                : "Sign In";
+            } else {
+              if (isRegister) {
+                // Registration success fallback
+                alertBox.innerText =
+                  "🎉 Account created successfully! Switching tabs...";
+                alertBox.className =
+                  "p-3 text-xs rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-medium text-center block";
+                setTimeout(() => {
+                  window.location.href = "/auth/login";
+                }, 1500);
+              } else {
+                // 3. HARD REDIRECT BYPASSED FROM ROUTER CLASHES
+                btnText.innerText = "Redirecting...";
+                window.location.replace(result.redirectTo || "/dashboard");
+              }
+            }
+          } catch (err) {
+            alertBox.innerText =
+              "Network transmission breakdown. Check your server connection.";
+            alertBox.className =
+              "p-3 text-xs rounded border border-red-500/30 bg-red-500/10 text-red-400 font-medium text-center block";
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            spinner.style.display = "none";
+          }
+        });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        if (localStorage.getItem("theme") === "light") {
+          document.documentElement.classList.add("light-theme");
+          const pageLogo = document.getElementById("login-brand-logo");
+          if (pageLogo) pageLogo.style.color = "#0f172a";
+        }
+      });
+    </script>
+  </body>
+</html>
