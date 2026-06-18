@@ -1,68 +1,3 @@
-// import express from "express";
-// import path from "path";
-// import { fileURLToPath } from "url";
-// import { crawlSite } from "./services/crawler.js";
-// import { remediatePage } from "./services/transformer.js";
-
-// const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// const app = express();
-// const PORT = process.env.PORT || 3000;
-
-// // Memory storage for prototype demo runs
-// let ScanSessionDatabase = {};
-
-// app.set("view engine", "ejs");
-// app.set("views", path.join(__dirname, "views"));
-// app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
-
-// // Serve Dashboard
-// app.get("/", (req, res) => {
-//   res.render("dashboard", { session: null, error: null });
-// });
-
-// // HTMX Endpoint for initiating scans
-// app.post("/api/scan", async (req, res) => {
-//   const { targetUrl } = req.body;
-//   if (!targetUrl) return res.status(400).send("URL is required");
-
-//   try {
-//     // 1. Crawl
-//     const sitePages = await crawlSite(targetUrl, 8);
-//     const results = [];
-//     let globalScoreDelta = { before: 62, after: 94 }; // Simulated programmatic Lighthouse bump
-
-//     // 2. Audit and Fix
-//     Object.entries(sitePages).forEach(([url, html]) => {
-//       const { optimizedHtml, issues, fixes } = remediatePage(url, html);
-//       results.push({
-//         url,
-//         rawHtml: html,
-//         optimizedHtml,
-//         issues,
-//         fixes,
-//       });
-//     });
-
-//     const sessionId = Date.now().toString();
-//     ScanSessionDatabase[sessionId] = { targetUrl, results, globalScoreDelta };
-
-//     // Return the dashboard data partial to HTMX
-//     res.render("partials/results", { session: ScanSessionDatabase[sessionId] });
-//   } catch (err) {
-//     res
-//       .status(500)
-//       .send(
-//         `<div class="text-red-500 font-bold">Scan failed: ${err.message}</div>`,
-//       );
-//   }
-// });
-
-// app.listen(PORT, () =>
-//   console.log(`🚀 Developer SaaS Engine running on http://localhost:${PORT}`),
-// );
-
-//========================================
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -97,9 +32,10 @@ connectDB();
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(cookieParser());
+app.use(express.static("public"));
 
 // Volatile runtime caching for file generation references
 let ScanSessionDatabase = {};
