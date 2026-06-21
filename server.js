@@ -13,6 +13,10 @@ import User from "./models/User.js";
 import { protect } from "./middleware/auth.js";
 import { crawlSite } from "./services/crawler.js";
 import { remediatePage } from "./services/transformer.js";
+import {
+  generateVerificationToken,
+  verifyDomainOwnership,
+} from "./services/verify.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -114,14 +118,16 @@ app.post("/auth/login", async (req, res) => {
     }
 
     // Generate Verification JWT
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
+    // const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1d" });
 
     // Set cookie cleanly
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 Days
+      //maxAge: 7 * 24 * 60 * 60 * 1000, // 7 Days
+      maxAge: 1 * 24 * 60 * 60 * 1000, // 1 Day
     });
 
     // Send JSON signal allowing frontend window control
@@ -253,10 +259,43 @@ app.get("/dashboard", protect, (req, res) => {
 // });
 app.post("/api/scan", protect, async (req, res) => {
   const targetUrl = req.body?.targetUrl;
-  if (!targetUrl)
-    return res.status(400).send("Target validation context lost.");
+  // if (!targetUrl)
+  //   return res.status(400).send("Target validation context lost.");
+  if (!targetUrl) {
+    // Setting this header tells HTMX to swap the content anyway, even on a 400 error status!
+    res.setHeader("HX-Retarget", "#dashboard-results");
+    return res
+      .status(400)
+      .send("Target validation context lost. URL input was missing.");
+  }
 
   try {
+    // 🔒 GUARD 1: Execute active site ownership handshakes
+    const isAuthorized = await verifyDomainOwnership(targetUrl, req.user._id);
+
+    if (!isAuthorized) {
+      const personalToken = generateVerificationToken(req.user._id);
+
+      // Halt crawl execution and return a descriptive setup instruction view
+      return res.status(200).send(`
+        <div class="p-5 rounded-2xl bg-slate-950 border border-yellow-500/30 text-slate-200 space-y-3">
+          <div class="flex items-center gap-2 text-yellow-400 font-bold text-sm">
+            <span>⚠️</span> Domain Ownership Verification Required
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            To prevent unauthorized crawler abuse, you must verify that you own or manage <code class="text-teal-400">${targetUrl}</code> before running optimization pipelines.
+          </p>
+          <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 text-[11px] font-mono space-y-1">
+            <span class="text-slate-500">// Copy and paste this tag into your site's &lt;head&gt; region:</span>
+            <code class="text-cyan-400 block select-all">&lt;meta name="remedial-verification" content="${personalToken}"&gt;</code>
+          </div>
+          <p class="text-[10px] text-slate-500 italic">
+            Once added, redeploy your site and click "Run Optimization" again to authorize your session.
+          </p>
+        </div>
+      `);
+    }
+
     const sitePages = await crawlSite(targetUrl, 6);
     const results = [];
     let cumulativeFixes = 0;

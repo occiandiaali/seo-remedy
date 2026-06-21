@@ -19,6 +19,44 @@
         </div>
     <% } %>
 
+    <% if (locals.session && session.globalScoreDelta) { %>
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+            <h4 class="text-xs font-mono text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                <span>📊</span> Simulated Core Web Vitals Improvement
+            </h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-slate-400">Search Engine Visibility & Tags</span>
+                        <span class="text-emerald-400 font-bold">
+                            <%= session.globalScoreDelta.before %>% → <%= session.globalScoreDelta.after %>% 
+                            (+<%= session.globalScoreDelta.after - session.globalScoreDelta.before %>%)
+                        </span>
+                    </div>
+                    <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                        <div class="bg-gradient-to-r from-red-500 via-yellow-500 to-emerald-500 h-2 rounded-full transition-all duration-1000" 
+                             style="width: <%= session.globalScoreDelta.after %>%"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-slate-400">Semantic Layout Integrity</span>
+                        <span class="text-teal-400 font-bold">
+                            <%= Math.min(100, session.globalScoreDelta.before + 15) %>% → 100% 
+                            (+<%= 100 - Math.min(100, session.globalScoreDelta.before + 15) %>%)
+                        </span>
+                    </div>
+                    <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                        <div class="bg-gradient-to-r from-orange-500 to-teal-400 h-2 rounded-full transition-all duration-1000" 
+                             style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
     <div class="border border-slate-800 bg-slate-900 rounded-2xl overflow-hidden shadow-2xl">
         <div class="border-b border-slate-800 bg-slate-950/40 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
             <div>

@@ -1,7 +1,7 @@
 {
   "name": "seo-remedy",
   "version": "1.0.0",
-  "description": "",
+  "description": "turn website auditing and manual fixing into a single, automated step",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
