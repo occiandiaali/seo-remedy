@@ -15,6 +15,7 @@ import { crawlSite } from "./services/crawler.js";
 import { remediatePage } from "./services/transformer.js";
 import {
   generateVerificationToken,
+  getCleanDomain,
   verifyDomainOwnership,
 } from "./services/verify.js";
 
@@ -269,31 +270,72 @@ app.post("/api/scan", protect, async (req, res) => {
       .send("Target validation context lost. URL input was missing.");
   }
 
+  // Extract clean root host identifier context (e.g., "myportfolio.com")
+  const targetDomain = getCleanDomain(targetUrl);
+  if (!targetDomain)
+    return res.status(400).send("Invalid URL structure submitted.");
+
   try {
-    // 🔒 GUARD 1: Execute active site ownership handshakes
-    const isAuthorized = await verifyDomainOwnership(targetUrl, req.user._id);
+    // Fetch fresh user data status directly from MongoDB instance
+    const currentUser = await User.findById(req.user._id);
 
-    if (!isAuthorized) {
-      const personalToken = generateVerificationToken(req.user._id);
+    // 🔍 DB CHECK: Is this domain already permanently verified for this user account?
+    const alreadyVerified = currentUser.verifiedDomains.includes(targetDomain);
 
-      // Halt crawl execution and return a descriptive setup instruction view
-      return res.status(200).send(`
-        <div class="p-5 rounded-2xl bg-slate-950 border border-yellow-500/30 text-slate-200 space-y-3">
-          <div class="flex items-center gap-2 text-yellow-400 font-bold text-sm">
-            <span>⚠️</span> Domain Ownership Verification Required
+    // // 🔒 GUARD 1: Execute active site ownership handshakes
+    // const isAuthorized = await verifyDomainOwnership(targetUrl, req.user._id);
+
+    // if (!isAuthorized) {
+    //   const personalToken = generateVerificationToken(req.user._id);
+
+    //   // Halt crawl execution and return a descriptive setup instruction view
+    //   return res.status(200).send(`
+    //     <div class="p-5 rounded-2xl bg-slate-950 border border-yellow-500/30 text-slate-200 space-y-3">
+    //       <div class="flex items-center gap-2 text-yellow-400 font-bold text-sm">
+    //         <span>⚠️</span> Domain Ownership Verification Required
+    //       </div>
+    //       <p class="text-xs text-slate-400 leading-relaxed">
+    //         To prevent unauthorized crawler abuse, you must verify that you own or manage <code class="text-teal-400">${targetUrl}</code> before running optimization pipelines.
+    //       </p>
+    //       <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 text-[11px] font-mono space-y-1">
+    //         <span class="text-slate-500">// Copy and paste this tag into your site's &lt;head&gt; region:</span>
+    //         <code class="text-cyan-400 block select-all">&lt;meta name="remedial-verification" content="${personalToken}"&gt;</code>
+    //       </div>
+    //       <p class="text-[10px] text-slate-500 italic">
+    //         Once added, redeploy your site and click "Run Optimization" again to authorize your session.
+    //       </p>
+    //     </div>
+    //   `);
+    // }
+
+    if (!alreadyVerified) {
+      // Execute the live fallback crawling handshake check
+      const hasToken = await verifyDomainOwnership(targetUrl, req.user._id);
+
+      if (!hasToken) {
+        const personalToken = generateVerificationToken(req.user._id);
+        return res.status(200).send(`
+          <div class="p-5 rounded-2xl bg-slate-950 border border-yellow-500/30 text-slate-200 space-y-3">
+            <div class="flex items-center gap-2 text-yellow-400 font-bold text-sm">
+              <span>⚠️</span> Domain Ownership Verification Required
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              You must verify ownership of <code class="text-teal-400">${targetDomain}</code> before running optimization scans.
+            </p>
+            <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 text-[11px] font-mono space-y-1">
+              <span class="text-slate-500">// Copy and paste this tag into your site's &lt;head&gt; region:</span>
+              <code class="text-cyan-400 block select-all">&lt;meta name="remedial-verification" content="${personalToken}"&gt;</code>
+            </div>
           </div>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            To prevent unauthorized crawler abuse, you must verify that you own or manage <code class="text-teal-400">${targetUrl}</code> before running optimization pipelines.
-          </p>
-          <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 text-[11px] font-mono space-y-1">
-            <span class="text-slate-500">// Copy and paste this tag into your site's &lt;head&gt; region:</span>
-            <code class="text-cyan-400 block select-all">&lt;meta name="remedial-verification" content="${personalToken}"&gt;</code>
-          </div>
-          <p class="text-[10px] text-slate-500 italic">
-            Once added, redeploy your site and click "Run Optimization" again to authorize your session.
-          </p>
-        </div>
-      `);
+        `);
+      }
+
+      // 🎉 Success! Save the domain to the user's document array permanently
+      currentUser.verifiedDomains.push(targetDomain);
+      await currentUser.save();
+      console.log(
+        `🔒 Domain [${targetDomain}] verified and saved permanently for user ${currentUser.email}`,
+      );
     }
 
     const sitePages = await crawlSite(targetUrl, 6);

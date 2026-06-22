@@ -6,6 +6,8 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
     tier: { type: String, enum: ["free", "pro"], default: "free" },
+    // Persistent storage field for cleared domain routes
+    verifiedDomains: { type: [String], default: [] },
   },
   { timestamps: true },
 );

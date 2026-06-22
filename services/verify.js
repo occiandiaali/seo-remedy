@@ -1,14 +1,26 @@
 import crypto from "crypto";
 
-/**
- * Generates a unique tracking token based on the user's database ID
- */
+//Generates a unique tracking token based on the user's database ID
+
 export function generateVerificationToken(userId) {
   return crypto
     .createHmac("sha256", "verification-salt-key")
     .update(userId.toString())
     .digest("hex")
     .substring(0, 16);
+}
+
+/**
+ * Normalizes any URL string into a clean root host string (e.g., "example.com")
+ */
+export function getCleanDomain(targetUrl) {
+  try {
+    const parsed = new URL(targetUrl);
+    // Removes 'www.' if present to ensure matching normalization consistency
+    return parsed.host.replace(/^www\./, "");
+  } catch (err) {
+    return null;
+  }
 }
 
 /**
